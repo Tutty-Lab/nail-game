@@ -1,0 +1,33 @@
+import {feedback} from '../feedback.js';
+import {art} from '../art.js';
+export {art};
+export const colors=['#f26ba2','#9868c9','#53bbaa','#f5bf58','#ea8265','#69a7df','#a73561','#faf0df'];
+export const colorNames=['Pink','Purple','Mint','Yellow','Peach','Blue','Berry','Cream'];
+export const decorations=['','✦','♡','❀'];
+export const freshNails=()=>Array.from({length:5},()=>({color:0,decor:0}));
+export function nailSVG(nails){
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 340"><rect width="500" height="340" rx="32" fill="#ffedf4"/><path d="M60 300Q52 160 90 155Q125 150 128 240L138 110Q144 72 165 82L180 225 193 70Q199 32 222 55L236 222 250 86Q259 51 279 76L290 239 306 144Q327 111 342 149L340 281Q342 319 294 324H115Q80 322 60 300" fill="#edbdac" stroke="#d89f91" stroke-width="3"/>${nails.map((n,i)=>{
+    const positions=[[78,173,39,65,-15],[140,93,34,70,-5],[196,62,33,75,0],[256,86,33,72,2],[308,151,32,64,13]];
+    const [x,y,w,h,rotation]=positions[i];return `<g transform="rotate(${rotation} ${x+w/2} ${y+h/2})"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${w/2}" fill="${colors[n.color]}" stroke="#ffffff" stroke-width="2"/><path d="M${x+8} ${y+18}v${h/3}" stroke="white" opacity=".6" stroke-width="4" stroke-linecap="round"/><text x="${x+w/2}" y="${y+h*.67}" text-anchor="middle" font-size="23" fill="${n.color===7?'#ac527b':'#fff1c9'}">${decorations[n.decor]}</text></g>`;
+  }).join('')}<text x="386" y="285" text-anchor="middle" fill="#aa5176" font-family="sans-serif" font-size="19" font-weight="bold">nailplay</text><path d="m375 200 5 13 13 5-13 5-5 13-5-13-13-5 13-5" fill="#f5bf58"/></svg>`;
+}
+export function scope(root){
+  const controller=new AbortController(),timeouts=new Set();let frame=0,disposed=false;
+  return {
+    root,
+    on(target,event,callback){target.addEventListener(event,callback,{signal:controller.signal});},
+    later(callback,delay){const id=setTimeout(()=>{timeouts.delete(id);if(!disposed)callback();},delay);timeouts.add(id);},
+    loop(callback){let previous=performance.now();const tick=now=>{if(disposed)return;const dt=(document.hidden||document.querySelector('dialog[open]'))?0:Math.min((now-previous)/1000,.05);previous=now;callback(dt);frame=requestAnimationFrame(tick);};frame=requestAnimationFrame(tick);},
+    dispose(){disposed=true;controller.abort();timeouts.forEach(clearTimeout);cancelAnimationFrame(frame);}
+  };
+}
+export function button(label,action,cls='arc-button'){
+  const node=document.createElement('button');node.type='button';node.className=cls;node.textContent=label;node.onclick=action;return node;
+}
+export function announce(root,text){const node=root.querySelector('.arc-feedback');if(node)node.textContent=text;}
+export function finish(root,title,copy,effect='success'){
+  root.querySelector('.arc-result')?.remove();
+  const panel=document.createElement('div');panel.className='arc-result';panel.setAttribute('role','status');
+  const heading=document.createElement('h2');heading.textContent=title;
+  const p=document.createElement('p');p.textContent=copy;panel.append(heading,p);root.append(panel);feedback(effect,panel);
+}
