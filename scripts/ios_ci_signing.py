@@ -1,6 +1,7 @@
 """CI-only Apple signing for Nail Play. Never prints credentials.
 
-Imports the team's Apple Distribution identity into a throwaway keychain, then uses the
+Imports the team's Apple Distribution identity (or mints a temporary one when no .p12 is
+provided) into a throwaway keychain, then uses the
 App Store Connect API to register the bundle ID and create a fresh App Store profile.
 """
 import base64
@@ -78,26 +79,48 @@ def ensure_profile(fingerprint):
     return base64.b64decode(api('POST', '/profiles', auth, body)['data']['attributes']['profileContent'])
 
 
+def create_ephemeral_identity(keychain):
+    """No .p12 provided: mint a distribution certificate for this run only (revoked in cleanup)."""
+    key, csr = ROOT / 'ephemeral.key', ROOT / 'ephemeral.csr'
+    command('openssl', 'genrsa', '-out', str(key), '2048')
+    command('openssl', 'req', '-new', '-key', str(key), '-out', str(csr), '-subj', '/CN=Nail Play CI/O=Tutty Lab/C=VN')
+    body = {'data': {'type': 'certificates', 'attributes': {'certificateType': 'DISTRIBUTION', 'csrContent': csr.read_text()}}}
+    created = api('POST', '/certificates', token(), body)['data']
+    (ROOT / 'ephemeral-certificate.json').write_text(json.dumps({'id': created['id']}))
+    cer = ROOT / 'ephemeral.cer'
+    cer.write_bytes(base64.b64decode(created['attributes']['certificateContent']))
+    command('security', 'import', str(key), '-A', '-k', str(keychain))
+    command('security', 'import', str(cer), '-A', '-k', str(keychain))
+    print('Created a temporary Apple Distribution certificate for this run')
+
+
 def install():
     os.umask(0o077)
     ROOT.mkdir(mode=0o700)
     keychain = ROOT / 'build.keychain-db'
-    p12 = ROOT / 'distribution.p12'
-    p12.write_bytes(base64.b64decode(os.environ['IOS_DISTRIBUTION_P12_BASE64'], validate=True))
     original = shlex.split(command('security', 'list-keychains', '-d', 'user', output=True).decode())
     (ROOT / 'original-keychains.json').write_text(json.dumps(original))
     password = secrets.token_urlsafe(32)
     command('security', 'create-keychain', '-p', password, str(keychain))
     command('security', 'set-keychain-settings', '-lut', '21600', str(keychain))
     command('security', 'unlock-keychain', '-p', password, str(keychain))
-    command('security', 'import', str(p12), '-P', os.environ['IOS_P12_PASSWORD'], '-A', '-t', 'cert', '-f', 'pkcs12', '-k', str(keychain))
+    # Apple's intermediate so codesign can build a valid chain.
+    wwdr = ROOT / 'AppleWWDRCAG3.cer'
+    urllib.request.urlretrieve('https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer', wwdr)
+    command('security', 'import', str(wwdr), '-k', str(keychain))
+    if os.environ.get('IOS_DISTRIBUTION_P12_BASE64'):
+        p12 = ROOT / 'distribution.p12'
+        p12.write_bytes(base64.b64decode(os.environ['IOS_DISTRIBUTION_P12_BASE64'], validate=True))
+        command('security', 'import', str(p12), '-P', os.environ.get('IOS_P12_PASSWORD', ''), '-A', '-t', 'cert', '-f', 'pkcs12', '-k', str(keychain))
+    else:
+        create_ephemeral_identity(keychain)
     command('security', 'set-key-partition-list', '-S', 'apple-tool:,apple:,codesign:', '-s', '-k', password, str(keychain))
     command('security', 'list-keychains', '-d', 'user', '-s', str(keychain), *original)
-    identities = command('security', 'find-identity', '-v', '-p', 'codesigning', str(keychain), output=True).decode()
+    identities = command('security', 'find-identity', '-p', 'codesigning', str(keychain), output=True).decode()
     fingerprint = next((line.split()[1] for line in identities.splitlines()
                         if 'Apple Distribution' in line or 'iPhone Distribution' in line), None)
     if not fingerprint:
-        raise RuntimeError('No distribution identity in the provided .p12')
+        raise RuntimeError('No distribution identity available for signing')
 
     profile_path = ROOT / 'NailPlay.mobileprovision'
     profile_path.write_bytes(ensure_profile(fingerprint.upper()))
@@ -123,6 +146,13 @@ def install():
 
 
 def cleanup():
+    ephemeral = ROOT / 'ephemeral-certificate.json'
+    if ephemeral.exists():
+        try:
+            api('DELETE', '/certificates/' + json.loads(ephemeral.read_text())['id'], token())
+            print('Revoked the temporary distribution certificate')
+        except RuntimeError as error:
+            print('Could not revoke the temporary certificate: ' + str(error))
     original = ROOT / 'original-keychains.json'
     if original.exists():
         command('security', 'list-keychains', '-d', 'user', '-s', *json.loads(original.read_text()))

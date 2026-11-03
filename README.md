@@ -57,5 +57,5 @@ Action feedback includes match sparkles, card flips, cleared-tile animation and 
 - `npm run ios:icon`: tạo icon 1024px và màn khởi động từ hình SVG của game.
 - Workflow **iOS TestFlight** (chạy tay ở tab Actions): test → build web → `cap sync` → ký → lưu trữ → upload TestFlight.
   Script `scripts/ios_ci_signing.py` dùng App Store Connect API tự đăng ký Bundle ID và tạo profile `Nail Play App Store CI`.
-- Secrets cần có trong repo: `IOS_DISTRIBUTION_P12_BASE64`, `IOS_P12_PASSWORD`, `ASC_API_KEY_P8`, `ASC_KEY_ID`, `ASC_ISSUER_ID`
-  (cùng bộ với DropIt!). Cần tạo app "Nail Play" trong App Store Connect với Bundle ID trên trước lần upload đầu tiên.
+- Secrets bắt buộc: `ASC_API_KEY_P8`, `ASC_KEY_ID`, `ASC_ISSUER_ID` (key quyền App Manager trở lên). Tùy chọn: `IOS_DISTRIBUTION_P12_BASE64` + `IOS_P12_PASSWORD`; nếu thiếu, workflow tạo chứng chỉ Distribution tạm và thu hồi sau khi chạy.
+  Cần tạo app "Nail Play" trong App Store Connect với Bundle ID trên trước lần upload đầu tiên.
