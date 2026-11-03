@@ -1,17 +1,16 @@
-import {design,mixing} from './design.js';
 import {memory} from './memory.js';
 import {match3} from './match3.js';
-import {puzzle,differences} from './puzzles.js';
 import {catching} from './catch.js';
-import {salon} from './salon.js';
+import {sorting} from './sort.js';
+import {merging} from './merge.js';
+import {painting} from './painter.js';
+import {mixing} from './mixer.js';
 export const modes={
-  1:{title:'Nail Designer',hint:'Pick a finger, a polish color, and a decoration. Save your manicure when you finish.',mount:design},
-  2:{title:'Memory Match',hint:'Flip two cards at a time. Find all 8 matching pairs to win.',mount:memory},
-  3:{title:'Polish Pop',hint:'Tap two neighboring tiles to swap them. Reach 600 points in 20 moves. Swaps without a match do not cost a move.',mount:match3},
-  4:{title:'Copy the Look',hint:'Study the design for 8 seconds, then recreate all 5 nail colors and decorations. Check your score when ready.',mount:root=>design(root,{copy:true})},
-  5:{title:'Color Lab',hint:'Adjust the pink, blue, and yellow pigments to match the target shade. Tap Compare colors to see your score.',mount:mixing},
-  6:{title:'Polish Catch',hint:'Drag the basket or use the left/right buttons or arrow keys. Catch polish and avoid bottles marked ×. Missing a good bottle or catching a broken one costs a life. You have 3 lives and 45 seconds.',mount:catching},
-  7:{title:'Nail Jigsaw',hint:'Tap two pieces to swap them. Assemble all 9 pieces using the preview. Piece numbers show their correct positions, left to right and top to bottom.',mount:puzzle},
-  8:{title:'Spot the Difference',hint:'Compare the boards and select the 3 differences on the right. Five incorrect guesses end the game.',mount:differences},
-  9:{title:'Mini Nail Salon',hint:'Select a customer, match their requested color and service, then complete the order. Serve 8 customers in 60 seconds. The game ends if 3 customers leave.',mount:salon}
+  painter:{title:'Polish Painter',hint:'Copy the design brief by painting with your finger. Choose a color and brush size, use Fill nail for the base, and the bare-nail swatch to erase. Peek shows your current match. Reach the goal percentage to pass; higher matches earn more stars. 24 levels.',mount:painting},
+  mixer:{title:'Gradient Mixer',hint:'Recreate the target ombre. Choose a band, then tap pigments to drip them in; the band color is the mix of its drops. You have a limited number of drops. Compare when ready: 85% earns one star, 92% two, 97% three. Early levels show a live match percentage. 24 levels.',mount:mixing},
+  sort:{title:'Polish Sort',hint:'Tap a bottle, then tap another to pour. Polish only stacks on the same color or into an empty bottle. Fill every bottle with a single color. Grey layers are hidden until uncovered. 60 levels; fewer tools used means more stars.',mount:sorting},
+  merge:{title:'Polish Merge',hint:'Swipe or use the arrow keys. Every item slides; two matching items merge into the next item on the ladder. Reach the crown before the board fills. Your best score is saved on this device.',mount:merging},
+  pop:{title:'Polish Pop',hint:'Tap two neighboring tiles to swap them. Reach the score goal before moves run out; some levels also ask you to collect a marked item. Chain reactions multiply points. 30 levels.',mount:match3},
+  memory:{title:'Memory Match',hint:'Flip two cards at a time and find every pair. Early levels let you peek first; later levels add more cards and a move limit. 20 levels.',mount:memory},
+  catch:{title:'Polish Catch',hint:'Drag the basket or use the arrow keys. Catch polish, avoid bottles marked ×. Gold stars give +50, hearts restore a life. Reach the target score before time runs out. 20 levels.',mount:catching}
 };

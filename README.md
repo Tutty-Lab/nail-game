@@ -9,18 +9,20 @@ Máy chủ chỉ phục vụ trên máy hiện tại. Chưa triển khai công k
 
 ## Các trò chơi
 
-| Trò | Luật phiên bản hiện tại |
-| --- | --- |
-| Nail Match | Ghép 3 ô xếp lớp, khay 7 ô. Tối đa 5 màn. |
-| Thiết kế bộ móng | Sơn 5 móng, 8 màu, 4 kiểu trang trí; tải ảnh SVG. |
-| Lật thẻ tìm cặp | 16 thẻ, tìm đủ 8 cặp; tính số lượt lật. |
-| Ghép 3 lọ sơn | Bàn 6×6, đổi hai ô cạnh nhau, ghép chuỗi, 600 điểm trong 20 lượt. |
-| Làm nail theo mẫu | Nhớ mẫu 8 giây, tái tạo màu và họa tiết 5 móng, chấm điểm phần trăm. |
-| Pha màu sơn | Trộn 3 màu bằng thanh tỉ lệ, so độ gần với màu mục tiêu. |
-| Bắt lọ sơn | Kéo giỏ, phím mũi tên hoặc nút trái/phải; 45 giây, 3 mạng, tránh lọ có dấu ×. |
-| Xếp hình bộ móng | Đổi vị trí hai trong 9 mảnh để hoàn thành ảnh; có xem mẫu. |
-| Tìm điểm khác biệt | 3 khác biệt giữa hai bảng 12 hình; tối đa 5 lượt sai. |
-| Tiệm nail mini | Chọn khách, màu, dịch vụ; phục vụ 8 khách trong 60 giây; 3 khách bỏ đi thì thua. |
+| Trò | Màn | Luật |
+| --- | --- | --- |
+| Polish Painter | 24 | Tô bằng ngón tay theo đề bài (French tip, sọc, chấm bi, tim, chevron…), cọ 3 cỡ, đổ nền, tẩy. Chấm từng ô 20×30 so với mẫu; mục tiêu tính trên phần chi tiết nên đổ một màu không qua màn. |
+| Gradient Mixer | 24 | Nhỏ giọt 3→6 sắc tố vào 1→5 dải để tái tạo ombre; giới hạn số giọt; 85/92/97% = 1/2/3 sao. Mọi màu đích pha ra được. |
+| Polish Sort | 60 | Đổ sơn giữa các chai, mỗi chai một màu. 3→10 màu; từ màn 21 có lớp bị che; mọi màn kiểm chứng giải được bằng bộ giải. Undo, thêm chai rỗng (tắt từ màn 41). |
+| Nail Match | 5 | Ghép 3 ô xếp lớp, khay 7 ô; mỗi màn một bộ hình và bối cảnh; màn 5 là bẫy không thể thắng. |
+| Polish Merge | vô tận | Vuốt gộp 2 món giống nhau thành món cấp cao hơn, 13 cấp tới vương miện; lưu kỷ lục. |
+| Polish Pop | 30 | Đổi ô ghép 3, combo nhân điểm; màn chẵn có mục tiêu thu thập. |
+| Memory Match | 20 | 4→12 cặp, xem trước ở màn đầu, giới hạn lượt từ màn 4. |
+| Polish Catch | 20 | Hứng lọ sơn, sao +50, tim hồi mạng; tốc độ, tỉ lệ lọ vỡ, lọ trôi ngang tăng dần. |
+
+Đã bỏ: Copy the Look, Color Lab, Nail Jigsaw, Spot the Difference, Mini Nail Salon, Nail Designer (ít động lực chơi lại).
+Tiến độ, sao, kỷ lục lưu `localStorage` trên máy; không đăng nhập, không gửi dữ liệu, không quảng cáo, không thanh toán.
+Nền 3D dùng Three.js 0.170 đóng gói tại `vendor/` (MIT), chạy offline; tắt chuyển động khi máy bật giảm chuyển động.
 
 Tất cả trò có hướng dẫn bằng nút ?, chơi lại, quay menu. Bộ đếm thời gian dừng khi tab bị ẩn hoặc mở hộp thoại; rời trò sẽ hủy vòng lặp và tác vụ của lượt chơi đó.
 

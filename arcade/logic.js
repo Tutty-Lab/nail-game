@@ -26,25 +26,25 @@ export function legalMoves(board,size=6){
     if(b<board.length&&adjacent(a,b,size)&&findMatches(swap(board,a,b),size).length)moves.push([a,b]);
   return moves;
 }
-export function makeMatchBoard(random=Math.random,size=6){
+export function makeMatchBoard(random=Math.random,size=6,kinds=6){
   const board=[];
   for(let i=0;i<size*size;i++){
-    const choices=[0,1,2,3,4,5].filter(type=>!(i%size>=2&&board[i-1]===type&&board[i-2]===type)&&!(i>=size*2&&board[i-size]===type&&board[i-size*2]===type));
+    const choices=Array.from({length:kinds},(_,t)=>t).filter(type=>!(i%size>=2&&board[i-1]===type&&board[i-2]===type)&&!(i>=size*2&&board[i-size]===type&&board[i-size*2]===type));
     board.push(choices[Math.floor(random()*choices.length)]);
   }
   // Guaranteed legal swap, without an initial match.
   board[0]=0;board[1]=1;board[2]=0;board[size+1]=0;
   if(findMatches(board,size).length || !legalMoves(board,size).length){
-    const fixed=Array.from({length:size*size},(_,i)=>(Math.floor(i/size)*2+i%size)%6);
+    const fixed=Array.from({length:size*size},(_,i)=>(Math.floor(i/size)*2+i%size)%kinds);
     fixed[0]=0;fixed[1]=1;fixed[2]=0;fixed[size+1]=0;return fixed;
   }
   return board;
 }
-export function collapse(board,matched,random=Math.random,size=6){
+export function collapse(board,matched,random=Math.random,size=6,kinds=6){
   const result=[...board],removed=new Set(matched);
   for(let c=0;c<size;c++){
     const kept=[];for(let r=size-1;r>=0;r--)if(!removed.has(r*size+c))kept.push(board[r*size+c]);
-    for(let r=size-1;r>=0;r--)result[r*size+c]=kept[size-1-r]??Math.floor(random()*6);
+    for(let r=size-1;r>=0;r--)result[r*size+c]=kept[size-1-r]??Math.floor(random()*kinds);
   }
   return result;
 }
