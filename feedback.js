@@ -24,8 +24,15 @@ export function sound(kind='tap'){
     });
   }catch{}
 }
+// Native taps on iPhone through the Capacitor Haptics plugin; a no-op on the web.
+const haptic=kind=>{
+  const haptics=window.Capacitor?.Plugins?.Haptics;if(!haptics||!enabled)return;
+  if(kind==='success')haptics.notification({type:'SUCCESS'}).catch(()=>{});
+  else if(kind==='lose'||kind==='error')haptics.notification({type:kind==='lose'?'ERROR':'WARNING'}).catch(()=>{});
+  else if(kind!=='tap')haptics.impact({style:kind==='match'?'MEDIUM':'LIGHT'}).catch(()=>{});
+};
 export function feedback(kind='match',anchor){
-  sound(kind);
+  sound(kind);haptic(kind);
   if(!anchor||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   const node=document.createElement('span');node.className=`feedback-burst ${kind}`;node.setAttribute('aria-hidden','true');
   const rect=anchor.getBoundingClientRect();

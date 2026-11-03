@@ -40,7 +40,7 @@ Tất cả trò có hướng dẫn bằng nút ?, chơi lại, quay menu. Bộ �
 - Kiểm tra lượt chơi: ghép đủ 8 cặp, hoàn thành xếp hình, tìm đủ khác biệt, mẫu móng đạt 100%, xuất SVG, ghép 3 và điểm, kết thúc bắt lọ sơn, phục vụ 8 khách.
 - Kịch bản kiểm tra trình duyệt ở output/playwright/verify-arcade.js và verify-arcade-edges.js (chạy qua playwright-cli run-code --filename).
 
-Font tải từ Google Fonts; mất mạng dùng font hệ thống. Hình SVG nằm trong dự án, không phụ thuộc ảnh ngoài.
+Không tải font ngoài; dùng font bo tròn của hệ thống (SF Pro Rounded trên iPhone). Hình SVG nằm trong dự án, không phụ thuộc ảnh ngoài.
 
 ## English interface, effects and sound
 
@@ -49,3 +49,13 @@ All ten games, controls, help dialogs, results and accessibility labels now use 
 Shared synthesized sound effects use Web Audio: tap, pick, match, shuffle, success and loss. Sound starts after a user gesture. The header Sound on/off toggle applies to every game and persists in localStorage. Muting stops active tones; hiding the tab stops audio. No external audio downloads.
 
 Action feedback includes match sparkles, card flips, cleared-tile animation and result reveals. Reduced-motion preferences disable animation. Buttons and layered tiles keep stable hit targets.
+
+## iOS (Capacitor)
+
+- `npm run ios:sync`: chép web vào `www/`, đồng bộ project Xcode `ios/App` (Swift Package Manager, plugin Haptics).
+- Bundle ID `com.tuttylab.nailplay`, team `5MNN7PQYBD`, chỉ iPhone, khóa màn dọc, không mã hóa đặc biệt.
+- `npm run ios:icon`: tạo icon 1024px và màn khởi động từ hình SVG của game.
+- Workflow **iOS TestFlight** (chạy tay ở tab Actions): test → build web → `cap sync` → ký → lưu trữ → upload TestFlight.
+  Script `scripts/ios_ci_signing.py` dùng App Store Connect API tự đăng ký Bundle ID và tạo profile `Nail Play App Store CI`.
+- Secrets cần có trong repo: `IOS_DISTRIBUTION_P12_BASE64`, `IOS_P12_PASSWORD`, `ASC_API_KEY_P8`, `ASC_KEY_ID`, `ASC_ISSUER_ID`
+  (cùng bộ với DropIt!). Cần tạo app "Nail Play" trong App Store Connect với Bundle ID trên trước lần upload đầu tiên.

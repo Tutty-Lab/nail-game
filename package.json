@@ -1,1 +1,21 @@
-{"name":"nail-game","private":true,"type":"module","scripts":{"start":"node server.mjs","test":"node --test"}}
+{
+  "name": "nail-game",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test",
+    "build:web": "node scripts/build-web.mjs",
+    "ios:sync": "npm run build:web && cap sync ios",
+    "ios:icon": "node scripts/make-icon.mjs"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.6.10",
+    "@capacitor/haptics": "^7.0.5",
+    "@capacitor/ios": "^7.6.10"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.6.10",
+    "sharp": "^0.33.5"
+  }
+}

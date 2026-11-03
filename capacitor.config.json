@@ -1,0 +1,11 @@
+{
+  "appId": "com.tuttylab.nailplay",
+  "appName": "Nail Play",
+  "webDir": "www",
+  "backgroundColor": "#fff1f5",
+  "ios": {
+    "contentInset": "never",
+    "scrollEnabled": true,
+    "limitsNavigationsToAppBoundDomains": true
+  }
+}

@@ -7,3 +7,5 @@ output/
 *.log
 .DS_Store
 Thumbs.db
+www/
+ios/App/App/public/
