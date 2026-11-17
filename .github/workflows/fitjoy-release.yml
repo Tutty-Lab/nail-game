@@ -6,7 +6,7 @@ on:
       mode:
         description: Inspect App Store status or build and upload FitJoy
         type: choice
-        options: [inspect, build, upload, prepare]
+        options: [inspect, build, upload, prepare, submit]
         default: inspect
 
 permissions:
@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: Tutty-Lab/FitJoy
-          ref: 37678efd1e085a7a43607cc568f430039d4af2bd
+          ref: aa89ff12c7936b3ab7e7705b63818e0cc312b86b
       - name: Inspect FitJoy App Store status
         id: asc
         env:
@@ -43,6 +43,13 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           FITJOY_REVIEW_CONTACT: ${{ secrets.FITJOY_REVIEW_CONTACT }}
         run: python3 scripts/asc_prepare.py
+      - name: Submit selected FitJoy build for App Review
+        if: inputs.mode == 'submit'
+        env:
+          ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: python3 scripts/asc_submit.py
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         if: inputs.mode == 'build'
         with:
