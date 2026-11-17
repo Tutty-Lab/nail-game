@@ -27,6 +27,7 @@ jobs:
           repository: Tutty-Lab/FitJoy
           ref: 6672806b8d18e699b1aa91165be5d73b8f1e99eb
       - name: Inspect FitJoy App Store status
+        if: inputs.mode != 'submit'
         id: asc
         env:
           ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
@@ -49,7 +50,9 @@ jobs:
           ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-        run: python3 scripts/asc_submit.py
+        run: |
+          python3 -m pip install --quiet --break-system-packages 'pyjwt[crypto]==2.10.1'
+          python3 scripts/asc_submit.py
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         if: inputs.mode == 'build'
         with:
