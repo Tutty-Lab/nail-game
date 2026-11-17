@@ -6,7 +6,7 @@ on:
       mode:
         description: Inspect App Store status or build and upload FitJoy
         type: choice
-        options: [inspect, build, upload]
+        options: [inspect, build, upload, prepare]
         default: inspect
 
 permissions:
@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: Tutty-Lab/FitJoy
-          ref: a61139d58144096e894859a6d984bf8d262e15fa
+          ref: 981f3548e1d8fc4d32efdc45022561a963c43ee8
       - name: Inspect FitJoy App Store status
         id: asc
         env:
@@ -35,6 +35,13 @@ jobs:
         run: |
           python3 -m pip install --quiet --break-system-packages 'pyjwt[crypto]==2.10.1'
           python3 scripts/asc_inspect.py
+      - name: Prepare German listing
+        if: inputs.mode == 'prepare'
+        env:
+          ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: python3 scripts/asc_prepare.py
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         if: inputs.mode == 'build'
         with:
