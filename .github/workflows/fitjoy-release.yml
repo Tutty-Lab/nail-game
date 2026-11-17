@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: Tutty-Lab/FitJoy
-          ref: a40dede3d08fbbf2934045f06c3a18c73d6c5289
+          ref: 37678efd1e085a7a43607cc568f430039d4af2bd
       - name: Inspect FitJoy App Store status
         id: asc
         env:
@@ -41,6 +41,7 @@ jobs:
           ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          FITJOY_REVIEW_CONTACT: ${{ secrets.FITJOY_REVIEW_CONTACT }}
         run: python3 scripts/asc_prepare.py
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         if: inputs.mode == 'build'
