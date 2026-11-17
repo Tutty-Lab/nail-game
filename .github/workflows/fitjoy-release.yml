@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: Tutty-Lab/FitJoy
-          ref: 981f3548e1d8fc4d32efdc45022561a963c43ee8
+          ref: a40dede3d08fbbf2934045f06c3a18c73d6c5289
       - name: Inspect FitJoy App Store status
         id: asc
         env:
