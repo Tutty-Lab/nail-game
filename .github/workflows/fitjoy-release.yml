@@ -6,7 +6,7 @@ on:
       mode:
         description: Inspect App Store status or build and upload FitJoy
         type: choice
-        options: [inspect, build, upload, prepare, submit]
+        options: [inspect, build, prepare, pricing, submit]
         default: inspect
 
 permissions:
@@ -25,9 +25,9 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: Tutty-Lab/FitJoy
-          ref: 6672806b8d18e699b1aa91165be5d73b8f1e99eb
+          ref: 69b5eb529ffce224d5562c49a6eacb2d1447dbdb
       - name: Inspect FitJoy App Store status
-        if: inputs.mode != 'submit'
+        if: inputs.mode == 'inspect' || inputs.mode == 'prepare'
         id: asc
         env:
           ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
@@ -44,6 +44,15 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           FITJOY_REVIEW_CONTACT: ${{ secrets.FITJOY_REVIEW_CONTACT }}
         run: python3 scripts/asc_prepare.py
+      - name: Configure free app download pricing
+        if: inputs.mode == 'pricing'
+        env:
+          ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          python3 -m pip install --quiet --break-system-packages 'pyjwt[crypto]==2.10.1'
+          python3 scripts/asc_pricing.py
       - name: Submit selected FitJoy build for App Review
         if: inputs.mode == 'submit'
         env:
@@ -110,25 +119,8 @@ jobs:
           path: build/ipa/*.ipa
           if-no-files-found: error
           retention-days: 3
-      - name: Download verified FitJoy IPA
-        if: inputs.mode == 'upload'
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: fitjoy-ios-2-1
-          path: build/ipa
-          run-id: 44195374295
-          github-token: ${{ github.token }}
-      - name: Prepare upload key
-        if: inputs.mode == 'upload'
-        env:
-          ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-        run: |
-          umask 077
-          mkdir -p "$RUNNER_TEMP/fitjoy-signing/private_keys"
-          printf '%s' "$ASC_API_KEY_P8" > "$RUNNER_TEMP/fitjoy-signing/private_keys/AuthKey_${ASC_KEY_ID}.p8"
       - name: Upload to TestFlight
-        if: (inputs.mode == 'build' || inputs.mode == 'upload') && steps.asc.outputs.app_exists == 'true'
+        if: inputs.mode == 'build'
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
@@ -146,6 +138,3 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: python3 scripts/ios_ci_signing.py cleanup
-      - name: Remove upload key
-        if: always() && inputs.mode == 'upload'
-        run: rm -f "$RUNNER_TEMP/fitjoy-signing/private_keys/"*.p8
