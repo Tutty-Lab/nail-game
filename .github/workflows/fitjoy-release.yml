@@ -6,7 +6,7 @@ on:
       mode:
         description: Inspect App Store status or build and upload FitJoy
         type: choice
-        options: [inspect, build, prepare, pricing, submit]
+        options: [inspect, build, prepare, pricing, rights, submit]
         default: inspect
 
 permissions:
@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: Tutty-Lab/FitJoy
-          ref: 7195ee0d632f2b1f10ca43487554d70654bacc3c
+          ref: 571ebc0c9d009fea1113884d207a6973621ad127
       - name: Inspect FitJoy App Store status
         if: inputs.mode == 'inspect' || inputs.mode == 'prepare'
         id: asc
@@ -54,14 +54,15 @@ jobs:
           python3 -m pip install --quiet --break-system-packages 'pyjwt[crypto]==2.10.1'
           python3 scripts/asc_pricing.py
       - name: Submit selected FitJoy build for App Review
-        if: inputs.mode == 'submit'
+        if: inputs.mode == 'submit' || inputs.mode == 'rights'
         env:
+          RELEASE_MODE: ${{ inputs.mode }}
           ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           python3 -m pip install --quiet --break-system-packages 'pyjwt[crypto]==2.10.1'
-          python3 scripts/asc_submit.py
+          if [[ "$RELEASE_MODE" == "rights" ]]; then python3 scripts/asc_submit.py --prepare-only; else python3 scripts/asc_submit.py; fi
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         if: inputs.mode == 'build'
         with:
